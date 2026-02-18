@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { initialBoard } from "../../Constants";
 import { Piece, Position } from "../../models";
 import { Board } from "../../models/Board";
@@ -20,6 +20,7 @@ import {
 import { PieceType, TeamType } from "../../Types";
 import Chessboard from "../Chessboard/Chessboard";
 import { Howl } from "howler";
+import { useModelContextTools } from "../../hooks/useModelContextTools";
 
 const moveSound = new Howl({
   src: ["/sounds/move-self.mp3"],
@@ -196,12 +197,12 @@ export default function Referee() {
     return validMove;
   }
 
-  function promotePawn(pieceType: PieceType) {
+  const promotePawnAction = useCallback((pieceType: PieceType) => {
     if (promotionPawn === undefined) {
       return;
     }
 
-    setBoard((previousBoard) => {
+    setBoard(() => {
       const clonedBoard = board.clone();
       clonedBoard.pieces = clonedBoard.pieces.reduce((results, piece) => {
         if (piece.samePiecePosition(promotionPawn)) {
@@ -220,16 +221,23 @@ export default function Referee() {
     });
 
     modalRef.current?.classList.add("hidden");
-  }
+  }, [board, promotionPawn]);
 
   function promotionTeamType() {
     return promotionPawn?.team === TeamType.OUR ? "w" : "b";
   }
 
-  function restartGame() {
+  const restartGameAction = useCallback(() => {
     checkmateModalRef.current?.classList.add("hidden");
     setBoard(initialBoard.clone());
-  }
+  }, []);
+
+  useModelContextTools({
+    board,
+    playMove,
+    restartGame: restartGameAction,
+    promotePawn: promotePawnAction,
+  });
 
   return (
     <>
@@ -239,19 +247,19 @@ export default function Referee() {
       <div className="modal hidden" ref={modalRef}>
         <div className="modal-body">
           <img
-            onClick={() => promotePawn(PieceType.ROOK)}
+            onClick={() => promotePawnAction(PieceType.ROOK)}
             src={`/assets/images/rook_${promotionTeamType()}.png`}
           />
           <img
-            onClick={() => promotePawn(PieceType.BISHOP)}
+            onClick={() => promotePawnAction(PieceType.BISHOP)}
             src={`/assets/images/bishop_${promotionTeamType()}.png`}
           />
           <img
-            onClick={() => promotePawn(PieceType.KNIGHT)}
+            onClick={() => promotePawnAction(PieceType.KNIGHT)}
             src={`/assets/images/knight_${promotionTeamType()}.png`}
           />
           <img
-            onClick={() => promotePawn(PieceType.QUEEN)}
+            onClick={() => promotePawnAction(PieceType.QUEEN)}
             src={`/assets/images/queen_${promotionTeamType()}.png`}
           />
         </div>
@@ -263,7 +271,7 @@ export default function Referee() {
               The winning team is{" "}
               {board.winningTeam === TeamType.OUR ? "white" : "black"}!
             </span>
-            <button onClick={restartGame}>Play again</button>
+            <button onClick={restartGameAction}>Play again</button>
           </div>
         </div>
       </div>
