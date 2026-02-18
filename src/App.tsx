@@ -1,11 +1,15 @@
 import './App.css';
+import ModelContextBanner from './components/ModelContextBanner/ModelContextBanner';
 import Referee from './components/Referee/Referee';
 
 function App() {
   return (
-    <div id="app">
-      <Referee/>
-    </div>
+    <>
+      <ModelContextBanner />
+      <div id="app">
+        <Referee/>
+      </div>
+    </>
   );
 }
 

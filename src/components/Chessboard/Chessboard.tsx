@@ -122,16 +122,32 @@ export default function Chessboard({playMove, pieces} : Props) {
   }
 
   return (
-    <>
-      <div
-        onMouseMove={(e) => movePiece(e)}
-        onMouseDown={(e) => grabPiece(e)}
-        onMouseUp={(e) => dropPiece(e)}
-        id="chessboard"
-        ref={chessboardRef}
-      >
-        {board}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', paddingRight: '8px' }}>
+          {VERTICAL_AXIS.slice().reverse().map((rank) => (
+            <span key={rank} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', height: `${GRID_SIZE}px`, lineHeight: `${GRID_SIZE}px` }}>
+              {rank}
+            </span>
+          ))}
+        </div>
+        <div
+          onMouseMove={(e) => movePiece(e)}
+          onMouseDown={(e) => grabPiece(e)}
+          onMouseUp={(e) => dropPiece(e)}
+          id="chessboard"
+          ref={chessboardRef}
+        >
+          {board}
+        </div>
       </div>
-    </>
+      <div style={{ display: 'flex', paddingLeft: '28px' }}>
+        {HORIZONTAL_AXIS.map((file) => (
+          <span key={file} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', width: `${GRID_SIZE}px`, paddingTop: '8px' }}>
+            {file}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
