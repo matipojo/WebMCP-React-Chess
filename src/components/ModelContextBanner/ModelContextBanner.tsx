@@ -44,7 +44,7 @@ export default function ModelContextBanner() {
           Chrome Canary
         </a>
         {' '}and enable{' '}
-        <strong>chrome://flags/#model-context</strong>
+        <strong>chrome://flags/#enable-webmcp-testing</strong>
         {' '}to use AI tools with this chess game.
       </span>
     </div>
