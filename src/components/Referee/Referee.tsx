@@ -18,7 +18,7 @@ import {
   rookMove,
 } from "../../referee/rules";
 import { PieceType, TeamType } from "../../Types";
-import Chessboard from "../Chessboard/Chessboard";
+import Chessboard, { ChessboardHandle } from "../Chessboard/Chessboard";
 import { Howl } from "howler";
 import { useModelContextTools } from "../../hooks/useModelContextTools";
 
@@ -39,6 +39,7 @@ export default function Referee() {
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const modalRef = useRef<HTMLDivElement>(null);
   const checkmateModalRef = useRef<HTMLDivElement>(null);
+  const chessboardHandleRef = useRef<ChessboardHandle>(null);
 
   function playMove(playedPiece: Piece, destination: Position): boolean {
     // If the playing piece doesn't have any moves return
@@ -232,11 +233,16 @@ export default function Referee() {
     setBoard(initialBoard.clone());
   }, []);
 
+  const animateMove = useCallback((from: Position, to: Position, team: 'w' | 'b', onComplete?: () => void) => {
+    chessboardHandleRef.current?.animateMove(from, to, team, onComplete);
+  }, []);
+
   useModelContextTools({
     board,
     playMove,
     restartGame: restartGameAction,
     promotePawn: promotePawnAction,
+    animateMove,
   });
 
   return (
@@ -275,7 +281,7 @@ export default function Referee() {
           </div>
         </div>
       </div>
-      <Chessboard playMove={playMove} pieces={board.pieces} />
+      <Chessboard ref={chessboardHandleRef} playMove={playMove} pieces={board.pieces} />
     </>
   );
 }

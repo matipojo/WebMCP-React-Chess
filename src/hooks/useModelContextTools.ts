@@ -17,9 +17,10 @@ type ChessActions = {
   playMove: (piece: Piece, destination: Position) => boolean;
   restartGame: () => void;
   promotePawn: (pieceType: PieceType) => void;
+  animateMove?: (from: Position, to: Position, team: 'w' | 'b', onComplete?: () => void) => void;
 };
 
-export function useModelContextTools({ board, playMove, restartGame, promotePawn }: ChessActions) {
+export function useModelContextTools({ board, playMove, restartGame, promotePawn, animateMove }: ChessActions) {
   useEffect(() => {
     if (!navigator.modelContext) {
       return;
@@ -75,12 +76,24 @@ export function useModelContextTools({ board, playMove, restartGame, promotePawn
               return { success: false, message: `No piece at ${fromNotation}`, data: null };
             }
 
-            const success = playMove(piece, to);
-            return {
-              success,
-              message: success ? `Moved ${piece.type} from ${fromNotation} to ${toNotation}` : `Invalid move ${fromNotation} to ${toNotation}`,
-              data: { from: fromNotation, to: toNotation, piece: piece.type, team: piece.team },
+            const doMove = () => {
+              const success = playMove(piece, to);
+              return {
+                success,
+                message: success ? `Moved ${piece.type} from ${fromNotation} to ${toNotation}` : `Invalid move ${fromNotation} to ${toNotation}`,
+                data: { from: fromNotation, to: toNotation, piece: piece.type, team: piece.team },
+              };
             };
+
+            if (animateMove) {
+              return new Promise<ToolResponse>((resolve) => {
+                animateMove(from, to, piece.team as 'w' | 'b', () => {
+                  resolve(doMove());
+                });
+              });
+            }
+
+            return doMove();
           } catch (error) {
             return { success: false, message: `Move failed: ${error}`, data: null };
           }
@@ -151,5 +164,5 @@ export function useModelContextTools({ board, playMove, restartGame, promotePawn
     ];
 
     navigator.modelContext.provideContext({ tools });
-  }, [board, playMove, restartGame, promotePawn]);
+  }, [board, playMove, restartGame, promotePawn, animateMove]);
 }

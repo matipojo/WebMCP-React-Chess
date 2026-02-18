@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Chessboard.css";
 import Tile from "../Tile/Tile";
 import {
@@ -7,16 +7,42 @@ import {
   GRID_SIZE,
 } from "../../Constants";
 import { Piece, Position } from "../../models";
+import SimpleHandAnimation, { SimpleHandAnimationRef } from "./HandAnimation/SimpleHandAnimation";
+
+export type ChessboardHandle = {
+  animateMove: (from: Position, to: Position, team: 'w' | 'b', onComplete?: () => void) => void;
+};
 
 interface Props {
   playMove: (piece: Piece, position: Position) => boolean;
   pieces: Piece[];
 }
 
-export default function Chessboard({playMove, pieces} : Props) {
+const Chessboard = React.forwardRef<ChessboardHandle, Props>(function Chessboard({playMove, pieces}, ref) {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [grabPosition, setGrabPosition] = useState<Position>(new Position(-1, -1));
   const chessboardRef = useRef<HTMLDivElement>(null);
+  const simpleHandAnimationRef = useRef<SimpleHandAnimationRef>(null);
+  const pendingAnimationCallbackRef = useRef<(() => void) | null>(null);
+
+  const handleAnimationComplete = () => {
+    const callback = pendingAnimationCallbackRef.current;
+    pendingAnimationCallbackRef.current = null;
+    callback?.();
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    animateMove: (from: Position, to: Position, team: 'w' | 'b', onComplete?: () => void) => {
+      if (simpleHandAnimationRef.current) {
+        pendingAnimationCallbackRef.current = onComplete ?? null;
+        setTimeout(() => {
+          simpleHandAnimationRef.current?.playMove(from, to, team);
+        }, 100);
+      } else {
+        onComplete?.();
+      }
+    },
+  }));
 
   function grabPiece(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
@@ -125,32 +151,41 @@ export default function Chessboard({playMove, pieces} : Props) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', paddingRight: '8px' }}>
-          {VERTICAL_AXIS.slice().reverse().map((rank) => (
-            <span key={rank} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', height: `${GRID_SIZE}px`, lineHeight: `${GRID_SIZE}px` }}>
-              {rank}
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', paddingRight: '8px' }}>
+            {VERTICAL_AXIS.slice().reverse().map((rank) => (
+              <span key={rank} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', height: `${GRID_SIZE}px`, lineHeight: `${GRID_SIZE}px` }}>
+                {rank}
+              </span>
+            ))}
+          </div>
+          <div
+            onMouseMove={(e) => movePiece(e)}
+            onMouseDown={(e) => grabPiece(e)}
+            onMouseUp={(e) => dropPiece(e)}
+            id="chessboard"
+            ref={chessboardRef}
+          >
+            {board}
+          </div>
+        </div>
+        <div style={{ display: 'flex', paddingLeft: '28px' }}>
+          {HORIZONTAL_AXIS.map((file) => (
+            <span key={file} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', width: `${GRID_SIZE}px`, paddingTop: '8px' }}>
+              {file}
             </span>
           ))}
         </div>
-        <div
-          onMouseMove={(e) => movePiece(e)}
-          onMouseDown={(e) => grabPiece(e)}
-          onMouseUp={(e) => dropPiece(e)}
-          id="chessboard"
-          ref={chessboardRef}
-        >
-          {board}
-        </div>
       </div>
-      <div style={{ display: 'flex', paddingLeft: '28px' }}>
-        {HORIZONTAL_AXIS.map((file) => (
-          <span key={file} style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold', textAlign: 'center', width: `${GRID_SIZE}px`, paddingTop: '8px' }}>
-            {file}
-          </span>
-        ))}
-      </div>
-    </div>
+      <SimpleHandAnimation
+        ref={simpleHandAnimationRef}
+        chessboardRef={chessboardRef}
+        onAnimationComplete={handleAnimationComplete}
+      />
+    </>
   );
-}
+});
+
+export default Chessboard;
