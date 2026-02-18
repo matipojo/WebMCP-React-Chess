@@ -1,6 +1,6 @@
-# React Chess with Model Context Protocol (MCP)
+# React Chess with WebMCP
 
-A chess game that exposes its tools via the [Model Context Protocol](https://modelcontextprotocol.io/), allowing AI assistants to play chess through `navigator.modelContext`.
+A chess game that exposes its tools via the new [WebMCP](https://developer.chrome.com/blog/webmcp-epp) API, allowing AI assistants to play chess through `navigator.modelContext`.
 
 ## Live Demo
 
@@ -32,12 +32,6 @@ useModelContextTools hook
 navigator.modelContext
     ↓ AI assistant calls tools
 ```
-
-### Key files
-
-- `src/hooks/useModelContextTools.ts` — The single hook that registers MCP tools
-- `src/model-context-types.ts` — TypeScript types for `navigator.modelContext`
-- `src/utils/chess-notation-utils.ts` — Converts chess notation (e.g. `"e2"`) to board coordinates
 
 ---
 
