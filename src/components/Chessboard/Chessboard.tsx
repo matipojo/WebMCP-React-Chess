@@ -23,16 +23,17 @@ export default function Chessboard({playMove, pieces} : Props) {
     const chessboard = chessboardRef.current;
     if (element.classList.contains("chess-piece") && chessboard) {
       const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+      const boardSize = GRID_SIZE * 8;
       const grabY = Math.abs(
-        Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+        Math.ceil((e.clientY - chessboard.offsetTop - boardSize) / GRID_SIZE)
       );
       setGrabPosition(new Position(grabX, grabY));
 
       const x = e.clientX - GRID_SIZE / 2;
-      const y = e.clientY - GRID_SIZE / 2;
+      const y1 = e.clientY - GRID_SIZE / 2;
       element.style.position = "absolute";
       element.style.left = `${x}px`;
-      element.style.top = `${y}px`;
+      element.style.top = `${y1}px`;
 
       setActivePiece(element);
     }
@@ -41,12 +42,13 @@ export default function Chessboard({playMove, pieces} : Props) {
   function movePiece(e: React.MouseEvent) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
-      const minX = chessboard.offsetLeft - 25;
-      const minY = chessboard.offsetTop - 25;
-      const maxX = chessboard.offsetLeft + chessboard.clientWidth - 75;
-      const maxY = chessboard.offsetTop + chessboard.clientHeight - 75;
-      const x = e.clientX - 50;
-      const y = e.clientY - 50;
+      const halfTile = GRID_SIZE / 2;
+      const minX = chessboard.offsetLeft - halfTile + 25;
+      const minY = chessboard.offsetTop - halfTile + 25;
+      const maxX = chessboard.offsetLeft + chessboard.clientWidth - halfTile - 25;
+      const maxY = chessboard.offsetTop + chessboard.clientHeight - halfTile - 25;
+      const x = e.clientX - halfTile;
+      const y = e.clientY - halfTile;
       activePiece.style.position = "absolute";
 
       //If x is smaller than minimum amount
@@ -81,8 +83,9 @@ export default function Chessboard({playMove, pieces} : Props) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
       const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+      const boardSize = GRID_SIZE * 8;
       const y = Math.abs(
-        Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+        Math.ceil((e.clientY - chessboard.offsetTop - boardSize) / GRID_SIZE)
       );
 
       const currentPiece = pieces.find((p) =>
