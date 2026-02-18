@@ -1,12 +1,53 @@
-# React Chess Game
+# React Chess with Model Context Protocol (MCP)
 
-Welcome to the React Chess Game repository! This chess game is a modern, responsive web application built using React and TypeScript. Aimed at providing a seamless chess-playing experience, it's perfect for both beginners and seasoned players who want to enjoy a game of chess on-the-go or from the comfort of their browser.
+A chess game that exposes its tools via the [Model Context Protocol](https://modelcontextprotocol.io/), allowing AI assistants to play chess through `navigator.modelContext`.
+
+## Live Demo
+
+**[Play it on GitHub Pages](https://matipojo.github.io/React-Chess)**
+
+> Requires [Chrome Canary](https://www.google.com/chrome/canary/) with `chrome://flags/#enable-webmcp-testing` enabled.
+
+## MCP Tools
+
+When `navigator.modelContext` is available, the app registers these tools that any AI assistant can call:
+
+| Tool | Description |
+|------|-------------|
+| `get-board-state` | Returns all piece positions, current turn, and game status |
+| `make-move` | Makes a move using notation like `"e2:e4"` |
+| `get-possible-moves` | Lists legal moves for a piece at a given position |
+| `restart-game` | Resets the board to the starting position |
+| `promote-pawn` | Promotes a pawn to queen, rook, bishop, or knight |
+
+### How it works
+
+A single React hook (`src/hooks/useModelContextTools.ts`) registers all chess tools with `navigator.modelContext.provideContext()`. Each tool directly calls the game's state and actions — no wrappers, no globals, no indirection.
+
+```
+Referee component (game state)
+    ↓ passes board + actions
+useModelContextTools hook
+    ↓ registers tools on
+navigator.modelContext
+    ↓ AI assistant calls tools
+```
+
+### Key files
+
+- `src/hooks/useModelContextTools.ts` — The single hook that registers MCP tools
+- `src/model-context-types.ts` — TypeScript types for `navigator.modelContext`
+- `src/utils/chess-notation-utils.ts` — Converts chess notation (e.g. `"e2"`) to board coordinates
+
+---
+
+## Original Repo
+
+---
+
+This chess game is based on [React-Chess](https://github.com/szabolcsthedeveloper/React-Chess) by [@szabolcsthedeveloper](https://github.com/szabolcsthedeveloper).
 
 ![React Chess Game Preview](https://i.imgur.com/9aAIZKX.png)
-
-## Demo
-
-Experience the live demo: [Play Chess Now](https://chess-game-react.netlify.app/)
 
 ## Features
 
@@ -17,40 +58,34 @@ Experience the live demo: [Play Chess Now](https://chess-game-react.netlify.app/
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
-
 ### Prerequisites
 
-Before you begin, ensure you have the latest version of `npm` installed on your machine. To install `npm`, run this command:
-
-npm install npm@latest -g
+Before you begin, ensure you have the latest version of `npm` installed on your machine.
 
 ### Installation
 
 1. Clone the repository:
-git clone https://github.com/szabolcsthedeveloper/React-Chess
+```
+git clone https://github.com/matipojo/React-Chess
+```
 
 2. Navigate to the project directory:
-cd react-chess-game
+```
+cd React-Chess
+```
 
 3. Install the project dependencies:
+```
 npm install
+```
 
 4. Start the development server:
+```
 npm start
+```
 
-This will run the app in the development mode. Open http://localhost:3000 to view it in your browser.
+Open http://localhost:3000 to view it in your browser.
 
 ## Usage
 
-To play the game, simply start a new game and move the pieces by clicking on them and then clicking on the target square. The game will enforce legal moves and provide a visual indicator of possible moves.
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
-3. Commit your Changes (git commit -m 'Add some AmazingFeature')
-4. Push to the Branch (git push origin feature/AmazingFeature)
-5. Open a Pull Request
+Move pieces by clicking and dragging them to the target square. The game enforces legal moves and highlights possible destinations.
