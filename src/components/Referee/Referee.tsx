@@ -23,15 +23,15 @@ import { Howl } from "howler";
 import { useModelContextTools } from "../../hooks/useModelContextTools";
 
 const moveSound = new Howl({
-  src: ["/sounds/move-self.mp3"],
+  src: [`${process.env.PUBLIC_URL}/sounds/move-self.mp3`],
 });
 
 const captureSound = new Howl({
-  src: ["/sounds/capture.mp3"],
+  src: [`${process.env.PUBLIC_URL}/sounds/capture.mp3`],
 });
 
 const checkmateSound = new Howl({
-  src: ["/sounds/move-check.mp3"],
+  src: [`${process.env.PUBLIC_URL}/sounds/move-check.mp3`],
 });
 
 export default function Referee() {
@@ -254,19 +254,19 @@ export default function Referee() {
         <div className="modal-body">
           <img
             onClick={() => promotePawnAction(PieceType.ROOK)}
-            src={`/assets/images/rook_${promotionTeamType()}.png`}
+            src={`${process.env.PUBLIC_URL}/assets/images/rook_${promotionTeamType()}.png`}
           />
           <img
             onClick={() => promotePawnAction(PieceType.BISHOP)}
-            src={`/assets/images/bishop_${promotionTeamType()}.png`}
+            src={`${process.env.PUBLIC_URL}/assets/images/bishop_${promotionTeamType()}.png`}
           />
           <img
             onClick={() => promotePawnAction(PieceType.KNIGHT)}
-            src={`/assets/images/knight_${promotionTeamType()}.png`}
+            src={`${process.env.PUBLIC_URL}/assets/images/knight_${promotionTeamType()}.png`}
           />
           <img
             onClick={() => promotePawnAction(PieceType.QUEEN)}
-            src={`/assets/images/queen_${promotionTeamType()}.png`}
+            src={`${process.env.PUBLIC_URL}/assets/images/queen_${promotionTeamType()}.png`}
           />
         </div>
       </div>
