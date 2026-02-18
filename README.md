@@ -4,7 +4,7 @@ A chess game that exposes its tools via the [Model Context Protocol](https://mod
 
 ## Live Demo
 
-**[Play it on GitHub Pages](https://matipojo.github.io/React-Chess)**
+**[Play it on GitHub Pages](https://matipojo.github.io/WebMCP-React-Chess)**
 
 > Requires [Chrome Canary](https://www.google.com/chrome/canary/) with `chrome://flags/#enable-webmcp-testing` enabled.
 
